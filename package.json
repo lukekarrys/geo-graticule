@@ -1,7 +1,7 @@
 {
   "name": "geo-graticule",
   "description": "Helper for turning a geocode into information about its graticule.",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "author": "Luke Karrys",
   "bugs": {
     "url": "https://github.com/lukekarrys/geo-graticule/issues"
