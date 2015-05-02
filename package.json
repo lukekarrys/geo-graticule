@@ -1,0 +1,43 @@
+{
+  "name": "geo-graticule",
+  "description": "Helper for turning a geocode into a graticule.",
+  "version": "0.0.0",
+  "author": "Luke Karrys",
+  "bugs": {
+    "url": "https://github.com/lukekarrys/geo-graticule/issues"
+  },
+  "dependencies": {
+    "node-geo-distance": "^1.2.0"
+  },
+  "devDependencies": {
+    "babel": "^5.2.6",
+    "babel-tape-runner": "^1.1.0",
+    "precommit-hook": "^2.0.1",
+    "standard": "^3.7.2",
+    "tap-spec": "^3.0.0",
+    "tape": "^4.0.0"
+  },
+  "homepage": "https://github.com/lukekarrys/geo-graticule",
+  "keywords": [
+    "geo",
+    "geohash",
+    "graticule",
+    "xkcd"
+  ],
+  "license": "MIT",
+  "main": "lib/index.js",
+  "pre-commit": [
+    "lint",
+    "test"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:lukekarrys/geo-graticule.git"
+  },
+  "scripts": {
+    "compile": "babel src --out-dir lib",
+    "lint": "standard .",
+    "prepublish": "npm run compile",
+    "test": "babel-tape-runner test/*.js | tap-spec"
+  }
+}
