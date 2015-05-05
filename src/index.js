@@ -1,13 +1,17 @@
-// Dealing with +/- geos
-// Most methods return an array of two numbers
-// This makes it easy to call toString on any return val
-
 import distance from 'node-geo-distance'
+import partial from 'lodash/function/partial'
 
+const addArray = (arr, arr2) => [arr[0] + arr2[0], arr[1] + arr2[1]]
 const makeBoxArray = (p1, p2, p3) => [[0, 0], p1, p2, p3]
 const QUADRANTS = {
+  // [up/down, left/right]
   NE: {
     // [+, +]
+    neighbors: [
+      [[1, -1], [1, 0], [1, 1]],
+      [[0, -1], [0, 0], [0, 1]],
+      [[-1, -1], [-1, 0], [-1, 1]]
+    ],
     center: [0.5, 0.5],
     box: makeBoxArray([0, 1], [1, 1], [1, 0]),
     test (latitude, longitude) {
@@ -17,6 +21,11 @@ const QUADRANTS = {
 
   NW: {
     // [+, -]
+    neighbors: [
+      [[1, 1], [1, 0], [1, -1]],
+      [[0, 1], [0, 0], [0, -1]],
+      [[-1, 1], [-1, 0], [-1, -1]]
+    ],
     center: [0.5, -0.5],
     box: makeBoxArray([0, -1], [1, -1], [1, 0]),
     test (latitude, longitude) {
@@ -26,6 +35,11 @@ const QUADRANTS = {
 
   SW: {
     // [-, -]
+    neighbors: [
+      [[-1, -1], [-1, 0], [-1, 1]],
+      [[0, -1], [0, 0], [0, 1]],
+      [[1, -1], [1, 0], [1, 1]]
+    ],
     center: [-0.5, -0.5],
     box: makeBoxArray([0, -1], [-1, -1], [-1, 0]),
     test (latitude, longitude) {
@@ -35,6 +49,11 @@ const QUADRANTS = {
 
   SE: {
     // [-, +]
+    neighbors: [
+      [[-1, 1], [-1, 0], [-1, -1]],
+      [[0, 1], [0, 0], [0, -1]],
+      [[1, 1], [1, 0], [1, -1]]
+    ],
     center: [-0.5, 0.5],
     box: makeBoxArray([0, 1], [-1, 1], [-1, 0]),
     test (latitude, longitude) {
@@ -86,6 +105,23 @@ class Geo {
 
   getGraticule () {
     return this.toArray().map((val) => parseInt(val, 10))
+  }
+
+  getNeighboringGraticules () {
+    const graticule = this.getGraticule()
+    const ag = partial(addArray, graticule)
+    const {neighbors} = QUADRANTS[this.getQuadrant()]
+    return [
+      [ag(neighbors[0][0]), ag(neighbors[0][1]), ag(neighbors[0][2])],
+      [ag(neighbors[1][0]), ag(neighbors[1][1]), ag(neighbors[1][2])],
+      [ag(neighbors[2][0]), ag(neighbors[2][1]), ag(neighbors[2][2])]
+    ]
+  }
+
+  getNeighboringGraticuleBoxes () {
+    return this.getNeighboringGraticules().map((row) => {
+      return row.map((graticule) => new Geo(graticule).getGraticuleBox())
+    })
   }
 
   pointWithinGraticule (latitude, longitude) {

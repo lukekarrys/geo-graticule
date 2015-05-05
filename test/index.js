@@ -90,23 +90,44 @@ test('Get graticule box', (t) => {
     [[34, 111], [34, 112], [35, 112], [35, 111]]
   ]
 
-  const m = (box, point, coordinate) => {
-    const messages = {
-      box: ['NW', 'SW', 'SE', 'NE'],
-      point: ['1', '2', '3', '4'],
-      coordinate: ['latitude', 'longitude']
-    }
+  t.deepEqual(boxes, expected)
+  t.end()
+})
 
-    return `${messages.box[box]} ${messages.point[point]} ${messages.coordinate[coordinate]}`
-  }
+test('Get neighbors', (t) => {
+  const graticules = [
+    new Geo(34.4, -111.1).getNeighboringGraticules(),
+    new Geo(-34.4, -111.1).getNeighboringGraticules(),
+    new Geo(-34.4, 111.1).getNeighboringGraticules(),
+    new Geo(34.4, 111.1).getNeighboringGraticules()
+  ]
 
-  boxes.forEach((box, bIndex) => {
-    box.forEach((point, pIndex) => {
-      point.forEach((coordinate, cIndex) => {
-        t.equal(coordinate, expected[bIndex][pIndex][cIndex], m(bIndex, pIndex, cIndex))
-      })
-    })
-  })
+  const expected = [
+    [ // NW
+      [[35, -110], [35, -111], [35, -112]],
+      [[34, -110], [34, -111], [34, -112]],
+      [[33, -110], [33, -111], [33, -112]]
+    ],
+    [ // SW
+      [[-35, -112], [-35, -111], [-35, -110]],
+      [[-34, -112], [-34, -111], [-34, -110]],
+      [[-33, -112], [-33, -111], [-33, -110]]
+    ],
+    [ // SE
+      [[-35, 112], [-35, 111], [-35, 110]],
+      [[-34, 112], [-34, 111], [-34, 110]],
+      [[-33, 112], [-33, 111], [-33, 110]]
+    ],
+    [ // NE
+      [[35, 110], [35, 111], [35, 112]],
+      [[34, 110], [34, 111], [34, 112]],
+      [[33, 110], [33, 111], [33, 112]]
+    ]
+  ]
 
+  t.deepEqual(graticules[0], expected[0], 'NW')
+  t.deepEqual(graticules[1], expected[1], 'SW')
+  t.deepEqual(graticules[2], expected[2], 'SE')
+  t.deepEqual(graticules[3], expected[3], 'NE')
   t.end()
 })
