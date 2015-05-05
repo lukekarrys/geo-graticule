@@ -37,8 +37,13 @@
   },
   "scripts": {
     "compile": "babel src --out-dir lib",
-    "lint": "standard .",
+    "lint": "standard",
     "prepublish": "npm run compile",
     "test": "babel-tape-runner test/*.js | tap-spec"
+  },
+  "standard": {
+    "ignore": [
+      "**/lib/**"
+    ]
   }
 }
