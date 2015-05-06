@@ -1,19 +1,31 @@
 import distance from 'node-geo-distance'
 import partial from 'lodash/function/partial'
+import rest from 'lodash/array/rest'
 
-const addArray = (arr, arr2) => [arr[0] + arr2[0], arr[1] + arr2[1]]
-const makeBoxArray = (p1, p2, p3) => [[0, 0], p1, p2, p3]
+const addArray = (arr) => (item, index) => item + arr[index]
+const addArrayMapper = (arr, arr2) => arr.map(addArray(arr2))
+const parseIntMapper = (val) => parseInt(val, 10)
+const decimal = (value) => '.' + value.split('.')[1]
+
 const QUADRANTS = {
   // [up/down, left/right]
   NE: {
     // [+, +]
+    // -------------
+    // |           |
+    // |           |
+    // |           |
+    // |           |
+    // |           |
+    // | **        |
+    // -------------
     neighbors: [
-      [[1, -1], [1, 0], [1, 1]],
-      [[0, -1], [0, 0], [0, 1]],
-      [[-1, -1], [-1, 0], [-1, 1]]
+      [1, -1], [1, 0], [1, 1],
+      [0, 1], [0, 0], [0, -1],
+      [-1, -1], [-1, 0], [-1, 1]
     ],
     center: [0.5, 0.5],
-    box: makeBoxArray([0, 1], [1, 1], [1, 0]),
+    box: [[0, 1], [0, 0], [1, 0], [1, 1]],
     test (latitude, longitude) {
       return latitude > 0 && longitude > 0
     }
@@ -21,13 +33,21 @@ const QUADRANTS = {
 
   NW: {
     // [+, -]
+    // -------------
+    // |           |
+    // |           |
+    // |           |
+    // |           |
+    // |           |
+    // |           |
+    // ------------- **
     neighbors: [
-      [[1, 1], [1, 0], [1, -1]],
-      [[0, 1], [0, 0], [0, -1]],
-      [[-1, 1], [-1, 0], [-1, -1]]
+      [1, 1], [1, 0], [1, -1],
+      [0, -1], [0, 0], [0, 1],
+      [-1, 1], [-1, 0], [-1, -1]
     ],
     center: [0.5, -0.5],
-    box: makeBoxArray([0, -1], [1, -1], [1, 0]),
+    box: [[0, 0], [0, -1], [1, -1], [1, 0]],
     test (latitude, longitude) {
       return latitude > 0 && longitude < 0
     }
@@ -35,13 +55,21 @@ const QUADRANTS = {
 
   SW: {
     // [-, -]
+    // ------------- **
+    // |           |
+    // |           |
+    // |           |
+    // |           |
+    // |           |
+    // |           |
+    // -------------
     neighbors: [
-      [[-1, -1], [-1, 0], [-1, 1]],
-      [[0, -1], [0, 0], [0, 1]],
-      [[1, -1], [1, 0], [1, 1]]
+      [-1, -1], [-1, 0], [-1, 1],
+      [0, 1], [0, 0], [0, -1],
+      [1, -1], [1, 0], [1, 1]
     ],
     center: [-0.5, -0.5],
-    box: makeBoxArray([0, -1], [-1, -1], [-1, 0]),
+    box: [[-1, 0], [-1, -1], [0, -1], [0, 0]],
     test (latitude, longitude) {
       return latitude < 0 && longitude < 0
     }
@@ -49,13 +77,21 @@ const QUADRANTS = {
 
   SE: {
     // [-, +]
+    // -------------
+    // | **        |
+    // |           |
+    // |           |
+    // |           |
+    // |           |
+    // |           |
+    // -------------
     neighbors: [
-      [[-1, 1], [-1, 0], [-1, -1]],
-      [[0, 1], [0, 0], [0, -1]],
-      [[1, 1], [1, 0], [1, -1]]
+      [-1, 1], [-1, 0], [-1, -1],
+      [0, -1], [0, 0], [0, 1],
+      [1, 1], [1, 0], [1, -1]
     ],
     center: [-0.5, 0.5],
-    box: makeBoxArray([0, 1], [-1, 1], [-1, 0]),
+    box: [[-1, 1], [-1, 0], [0, 0], [0, 1]],
     test (latitude, longitude) {
       return latitude < 0 && longitude > 0
     }
@@ -82,13 +118,23 @@ class Geo {
     this.longitude = Number(longitude)
   }
 
-  getQuadrant () {
-    for (const quadrant of Object.keys(QUADRANTS)) {
-      if (QUADRANTS[quadrant].test.apply(null, this.toArray())) {
-        return quadrant
+  quadrant () {
+    const [latitude, longitude] = this.toArray()
+    const keys = Object.keys(QUADRANTS)
+    for (let i = 0, m = keys.length; i < m; i++) {
+      if (QUADRANTS[keys[i]].test(latitude, longitude)) {
+        return keys[i]
       }
     }
   }
+
+  quadrantData () {
+    return QUADRANTS[this.quadrant()]
+  }
+
+  // ======================
+  // Casting as certain values
+  // ======================
 
   toString () {
     return this.toArray().join(',')
@@ -98,56 +144,83 @@ class Geo {
     return [this.latitude, this.longitude]
   }
 
-  toObject () {
+  toJSON () {
     const {latitude, longitude} = this
     return {latitude, longitude}
   }
 
-  getGraticule () {
-    return this.toArray().map((val) => parseInt(val, 10))
+  _toGeo (latitude, longitude) {
+    return latitude instanceof Geo ? latitude : new Geo(latitude, longitude)
   }
 
-  getNeighboringGraticules () {
-    const graticule = this.getGraticule()
-    const ag = partial(addArray, graticule)
-    const {neighbors} = QUADRANTS[this.getQuadrant()]
-    return [
-      [ag(neighbors[0][0]), ag(neighbors[0][1]), ag(neighbors[0][2])],
-      [ag(neighbors[1][0]), ag(neighbors[1][1]), ag(neighbors[1][2])],
-      [ag(neighbors[2][0]), ag(neighbors[2][1]), ag(neighbors[2][2])]
-    ]
+  // ======================
+  // 8 neighboring graticules
+  // ======================
+
+  neighboringGraticules () {
+    return this.quadrantData().neighbors.map(this._graticuleAdder())
   }
 
-  getNeighboringGraticuleBoxes () {
-    return this.getNeighboringGraticules().map((row) => {
-      return row.map((graticule) => new Geo(graticule).getGraticuleBox())
+  neighboringGraticuleBoxes () {
+    return this._neighboringGraticulesWith('graticuleBox')
+  }
+
+  neighboringGraticuleCenters () {
+    return this._neighboringGraticulesWith('graticuleCenter')
+  }
+
+  neighboringGraticulePoints (latitude, longitude) {
+    return this._neighboringGraticulesWith('pointWithinGraticule', latitude, longitude)
+  }
+
+  _neighboringGraticulesWith (method) {
+    const args = rest(arguments)
+    return this.neighboringGraticules().map((graticule) => {
+      const geo = new Geo(graticule)
+      return geo[method].apply(geo, args)
     })
   }
 
-  pointWithinGraticule (latitude, longitude) {
-    // Parse the inputted point and map to a string and make sure
-    // to remove any leading numbers before the decimal point
-    const point = new Geo(latitude, longitude).toArray().map(String).map((value) => '.' + value.split('.')[1])
+  // ======================
+  // Individual graticule
+  // ======================
+
+  // Returns the integer values for the graticule for the point
+  graticule () {
+    return this.toArray().map(parseIntMapper)
+  }
+
+  // Returns the center of the graticule for the point
+  graticuleCenter () {
+    const graticule = this.graticule()
+    return this.quadrantData().center.map(addArray(graticule))
+  }
+
+  // Return the corners of the graticule for ths point
+  graticuleBox () {
+    return this.quadrantData().box.map(this._graticuleAdder())
+  }
+
+  // Takes the decimals of the passed in geo and maps them within the graticule
+  pointWithinGraticule () {
+    const point = this._toGeo.apply(this, arguments).toArray().map(String).map(decimal)
+    const graticule = this.graticule().map(String)
     // Depending on the number of decimals, we could lose precision if we just tried to add these
     // so thats why we are doing it all as string concatention
-    return this.getGraticule().map(String).map((value, index) => value + point[index]).map(Number)
+    return graticule.map(addArray(point)).map(Number)
   }
 
-  getGraticuleCenter () {
-    const graticule = this.getGraticule()
-    return QUADRANTS[this.getQuadrant()].center.map((val, index) => graticule[index] + val)
+  _graticuleAdder () {
+    return partial(addArrayMapper, this.graticule())
   }
 
-  getGraticuleBox () {
-    const [latitude, longitude] = this.getGraticule()
-    return QUADRANTS[this.getQuadrant()].box.map((indices) =>
-      [latitude + indices[0], longitude + indices[1]]
-    )
-  }
+  // ======================
+  // Distance
+  // ======================
 
-  metersFrom (latitude, longitude) {
-    const point = new Geo(latitude, longitude)
-    return distance.vincentySync(this.toObject(), point.toObject())
+  metersFrom () {
+    const geo = this._toGeo.apply(this, arguments)
+    return distance.vincentySync(this.toObject(), geo.toObject())
   }
 
   kilometersFrom () {
@@ -158,6 +231,11 @@ class Geo {
     return this.metersFrom.apply(this, arguments) * 0.000621371
   }
 
+  // ======================
+  // W30
+  // ======================
+
+  // Returns true if this point is east of the W30 line
   isW30 () {
     return this.longitude > -30
   }

@@ -26,10 +26,10 @@ geo.toString()      // '34.189,-110.8567'
 get.toArray()       // [ 34.189, -110.8567 ]
 get.toObject()      // { latitude: 34.189, longitude: -110.8567 }
 
-geo.getQuadrant()           // 'NW'
-geo.getGraticule()          // [ 34, -110 ]
-geo.getGraticuleCenter()    // [ 34.5, -110.5 ]
-geo.getGraticuleBox()       // [ [ 34, -110 ], [ 34, -111 ], [ 35, -111 ], [ 35, -110 ] ]
+geo.quadrant()           // 'NW'
+geo.graticule()          // [ 34, -110 ]
+geo.graticuleCenter()    // [ 34.5, -110.5 ]
+geo.graticuleBox()       // [ [ 34, -110 ], [ 34, -111 ], [ 35, -111 ], [ 35, -110 ] ]
 
 geo.pointWithinGraticule(0.456, 0.2345) // [ 34.456, -110.2345 ]
 ```

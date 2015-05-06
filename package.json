@@ -11,9 +11,12 @@
     "node-geo-distance": "^1.2.0"
   },
   "devDependencies": {
+    "async": "^0.9.0",
     "babel": "^5.2.6",
     "babel-tape-runner": "^1.1.0",
+    "open": "0.0.5",
     "precommit-hook": "^2.0.1",
+    "qs": "^2.4.1",
     "standard": "^3.7.2",
     "tap-spec": "^3.0.0",
     "tape": "^4.0.0"
