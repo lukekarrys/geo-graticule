@@ -41,6 +41,7 @@
   "scripts": {
     "compile": "babel src --out-dir lib",
     "lint": "standard",
+    "map": "babel-node examples/map.js",
     "prepublish": "npm run compile",
     "test": "babel-tape-runner test/*.js | tap-spec"
   },
