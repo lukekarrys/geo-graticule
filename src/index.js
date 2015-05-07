@@ -8,17 +8,36 @@ const parseIntMapper = (val) => parseInt(val, 10)
 const decimal = (value) => '.' + value.split('.')[1]
 
 const QUADRANTS = {
-  // [up/down, left/right]
+
+  //  A friendly reminder luke, ಠ_ಠ
+  //
+  //  Latitude    :   up    /  down
+  //  Longitude   :   left  /  right
+  //
+  //  All graticule box points in each quadrant will
+  //  be an array indexed by the number in that corner
+  //
+  //  The "X" is the corner of the whole numbers for that graticule
+  //
+  //   -------------   -------------
+  //   | 2       3 |   | 2       3 |
+  //   |           |   |           |
+  //   |     NW    |   |     NE    |
+  //   |   [+, -]  |   |   [+, +]  |
+  //   |           |   |           |
+  //   | 1       0 |   | 1       0 |
+  //   ------------X   X-------------
+  //
+  //   ------------X   X------------
+  //   | 2       3 |   | 2       3 |
+  //   |           |   |           |
+  //   |     SW    |   |     SE    |
+  //   |   [-, -]  |   |   [-, +]  |
+  //   |           |   |           |
+  //   | 1       0 |   | 1       0 |
+  //   -------------   -------------
+
   NE: {
-    // [+, +]
-    // -------------
-    // |           |
-    // |           |
-    // |           |
-    // |           |
-    // |           |
-    // | **        |
-    // -------------
     neighbors: [
       [1, -1], [1, 0], [1, 1],
       [0, 1], [0, 0], [0, -1],
@@ -27,20 +46,11 @@ const QUADRANTS = {
     center: [0.5, 0.5],
     box: [[0, 1], [0, 0], [1, 0], [1, 1]],
     test (latitude, longitude) {
-      return latitude > 0 && longitude > 0
+      return latitude >= 0 && longitude >= 0
     }
   },
 
   NW: {
-    // [+, -]
-    // -------------
-    // |           |
-    // |           |
-    // |           |
-    // |           |
-    // |           |
-    // |           |
-    // ------------- **
     neighbors: [
       [1, 1], [1, 0], [1, -1],
       [0, -1], [0, 0], [0, 1],
@@ -49,20 +59,11 @@ const QUADRANTS = {
     center: [0.5, -0.5],
     box: [[0, 0], [0, -1], [1, -1], [1, 0]],
     test (latitude, longitude) {
-      return latitude > 0 && longitude < 0
+      return latitude >= 0 && longitude <= 0
     }
   },
 
   SW: {
-    // [-, -]
-    // ------------- **
-    // |           |
-    // |           |
-    // |           |
-    // |           |
-    // |           |
-    // |           |
-    // -------------
     neighbors: [
       [-1, -1], [-1, 0], [-1, 1],
       [0, 1], [0, 0], [0, -1],
@@ -71,20 +72,11 @@ const QUADRANTS = {
     center: [-0.5, -0.5],
     box: [[-1, 0], [-1, -1], [0, -1], [0, 0]],
     test (latitude, longitude) {
-      return latitude < 0 && longitude < 0
+      return latitude <= 0 && longitude <= 0
     }
   },
 
   SE: {
-    // [-, +]
-    // -------------
-    // | **        |
-    // |           |
-    // |           |
-    // |           |
-    // |           |
-    // |           |
-    // -------------
     neighbors: [
       [-1, 1], [-1, 0], [-1, -1],
       [0, -1], [0, 0], [0, 1],
@@ -93,7 +85,7 @@ const QUADRANTS = {
     center: [-0.5, 0.5],
     box: [[-1, 1], [-1, 0], [0, 0], [0, 1]],
     test (latitude, longitude) {
-      return latitude < 0 && longitude > 0
+      return latitude <= 0 && longitude >= 0
     }
   }
 }

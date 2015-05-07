@@ -32,6 +32,17 @@ test('Get quadrant', (t) => {
   t.equal(new Geo(-34.5, -111.1).quadrant(), 'SW', 'SW quadrant')
   t.equal(new Geo(-34.5, 111.1).quadrant(), 'SE', 'SE quadrant')
   t.equal(new Geo(34.5, 111.1).quadrant(), 'NE', 'NE quadrant')
+
+  t.end()
+})
+
+test('Get quadrant with 0', (t) => {
+  t.equal(new Geo(0, -30).quadrant(), 'NW')
+  t.equal(new Geo(0, 30).quadrant(), 'NE')
+  t.equal(new Geo(-30, 0).quadrant(), 'SW')
+  t.equal(new Geo(30, 0).quadrant(), 'NE')
+  t.equal(new Geo(0, 0).quadrant(), 'NE')
+
   t.end()
 })
 
