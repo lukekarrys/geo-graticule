@@ -24,7 +24,7 @@ const geo = new Geo(34.189, -110.8567)
 
 geo.toString()      // '34.189,-110.8567'
 get.toArray()       // [ 34.189, -110.8567 ]
-get.toObject()      // { latitude: 34.189, longitude: -110.8567 }
+get.toJSON()        // { latitude: 34.189, longitude: -110.8567 }
 
 geo.quadrant()           // 'NW'
 geo.graticule()          // [ 34, -110 ]

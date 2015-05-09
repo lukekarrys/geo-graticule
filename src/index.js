@@ -212,7 +212,7 @@ class Geo {
 
   metersFrom () {
     const geo = this._toGeo.apply(this, arguments)
-    return distance.vincentySync(this.toObject(), geo.toObject())
+    return distance.vincentySync(this.toJSON(), geo.toJSON())
   }
 
   kilometersFrom () {
