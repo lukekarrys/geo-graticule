@@ -33,7 +33,8 @@
   "main": "lib/index.js",
   "pre-commit": [
     "lint",
-    "test"
+    "test",
+    "validate"
   ],
   "repository": {
     "type": "git",
@@ -44,7 +45,8 @@
     "lint": "standard",
     "map": "babel-node examples/map.js",
     "prepublish": "npm run compile",
-    "test": "babel-tape-runner test/*.js | tap-spec"
+    "test": "babel-tape-runner test/*.js | tap-spec",
+    "validate": "npm ls"
   },
   "standard": {
     "ignore": [
