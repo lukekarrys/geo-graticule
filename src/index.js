@@ -1,6 +1,6 @@
 import distance from 'node-geo-distance'
-import partial from 'lodash/function/partial'
-import rest from 'lodash/array/rest'
+import partial from 'lodash/partial'
+import tail from 'lodash/tail'
 
 const addArray = (arr) => (item, index) => item + arr[index]
 const addArrayMapper = (arr, arr2) => arr.map(addArray(arr2))
@@ -166,7 +166,7 @@ class Geo {
   }
 
   _neighboringGraticulesWith (method) {
-    const args = rest(arguments)
+    const args = tail(arguments)
     return this.neighboringGraticules().map((graticule) => {
       const geo = new Geo(graticule)
       return geo[method].apply(geo, args)

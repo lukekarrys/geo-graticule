@@ -1,5 +1,5 @@
 import {stringify} from 'qs'
-import defaults from 'lodash/object/defaults'
+import defaults from 'lodash/defaults'
 import open from 'open'
 import async from 'async'
 
