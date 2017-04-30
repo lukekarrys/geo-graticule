@@ -1,6 +1,8 @@
 geo-graticule
 ===================
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/lukekarrys/geo-graticule.svg)](https://greenkeeper.io/)
+
 Helper for turning a geocode into information about its graticule.
 
 I use this for [xkcd Geohashing](https://xkcd.com/426/).
