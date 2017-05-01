@@ -8,6 +8,7 @@ I use this for [xkcd Geohashing](https://xkcd.com/426/).
 [![NPM](https://nodei.co/npm/geo-graticule.png)](https://nodei.co/npm/geo-graticule/)
 [![Build Status](https://travis-ci.org/lukekarrys/geo-graticule.png?branch=master)](https://travis-ci.org/lukekarrys/geo-graticule)
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](https://github.com/feross/standard)
+[![Greenkeeper badge](https://badges.greenkeeper.io/lukekarrys/geo-graticule.svg)](https://greenkeeper.io/)
 
 
 ## Install
